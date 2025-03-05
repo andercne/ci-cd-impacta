@@ -34,29 +34,22 @@ jobs:
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
       - name: Get the latest tag
-        id: get_tag
-        run: |
-          TAG=$(git describe --tags --abbrev=0 | sed 's/^v//')  # Remove o 'v' no início
-          echo "Tag sem prefixo: $TAG"
-          echo "tag=$TAG" >> $GITHUB_ENV
-
-#      - name: Get the latest tag
-#       id: get_tag
-#       run: |
-#         TAG=$(git describe --tags --abbrev=0)
-#         echo "Latest tag: $TAG"
-#         echo "tag=$TAG" >> $GITHUB_ENV
+       id: get_tag
+       run: |
+         TAG=$(git describe --tags --abbrev=0)
+         echo "Latest tag: $TAG"
+         echo "tag=$TAG" >> $GITHUB_ENV
 
       - name: Build an image from Dockerfile
         env:
           DOCKER_BUILDKIT: 1
         run: |
-          docker build -t "${{ secrets.DOCKERHUB_USERNAME }}/ci-cd-impacta:${{ env.tag }}" .
+          docker build -t "${{ secrets.DOCKERHUB_USERNAME }}/myapp:${{ env.tag }}" .
 
       - name: Run Trivy vulnerability scanner
         uses: aquasecurity/trivy-action@master
         with:
-          image-ref: '${{ secrets.DOCKERHUB_USERNAME }}/ci-cd-impacta:${{ env.tag }}'
+          image-ref: '${{ secrets.DOCKERHUB_USERNAME }}/myapp:${{ env.tag }}'
           format: 'table'
           exit-code: '1'
           ignore-unfixed: true
@@ -65,4 +58,4 @@ jobs:
 
       - name: Push image
         run: |
-          docker image push ${{ secrets.DOCKERHUB_USERNAME }}/ci-cd-impacta:${{ env.tag }}
+          docker image push ${{ secrets.DOCKERHUB_USERNAME }}/myapp:${{ env.tag }}
