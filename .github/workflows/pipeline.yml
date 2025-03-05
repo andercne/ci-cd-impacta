@@ -36,9 +36,10 @@ jobs:
       - name: Get the latest tag
         id: get_tag
         run: |
-          TAG=$(git describe --tags --abbrev=0)
+          TAG=$(git describe --tags --abbrev=0 | tr -cd 'a-zA-Z0-9._-')
           echo "Latest tag: $TAG"
           echo "tag=$TAG" >> $GITHUB_ENV
+        
 
       - name: Debug DockerHub Username
         run: |
