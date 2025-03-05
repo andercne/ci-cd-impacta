@@ -36,9 +36,16 @@ jobs:
       - name: Get the latest tag
         id: get_tag
         run: |
-          TAG=$(git describe --tags --abbrev=0)
-          echo "Latest tag: $TAG"
+          TAG=$(git describe --tags --abbrev=0 | sed 's/^v//')  # Remove o 'v' no início
+          echo "Tag sem prefixo: $TAG"
           echo "tag=$TAG" >> $GITHUB_ENV
+
+#      - name: Get the latest tag
+#       id: get_tag
+#       run: |
+#         TAG=$(git describe --tags --abbrev=0)
+#         echo "Latest tag: $TAG"
+#         echo "tag=$TAG" >> $GITHUB_ENV
 
       - name: Build an image from Dockerfile
         env:
