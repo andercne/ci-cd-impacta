@@ -40,6 +40,9 @@ jobs:
           echo "Latest tag: $TAG"
           echo "tag=$TAG" >> $GITHUB_ENV
 
+      - name: Debug DockerHub Username
+        run: echo "DockerHub Username: '${{ secrets.DOCKERHUB_USERNAME }}'"
+        
       - name: Build an image from Dockerfile
         env:
           DOCKER_BUILDKIT: 1
