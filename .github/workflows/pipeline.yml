@@ -36,42 +36,20 @@ jobs:
       - name: Get the latest tag
         id: get_tag
         run: |
-          TAG=$(git describe --tags --abbrev=0 | tr -cd 'a-zA-Z0-9._-')
+          TAG=$(git describe --tags --abbrev=0)
           echo "Latest tag: $TAG"
           echo "tag=$TAG" >> $GITHUB_ENV
-        
 
-      - name: Debug DockerHub Username
-        run: |
-          echo "DockerHub Username: '${{ secrets.DOCKERHUB_USERNAME }}'"
-        
       - name: Build an image from Dockerfile
         env:
           DOCKER_BUILDKIT: 1
         run: |
-          USERNAME="${{ secrets.DOCKERHUB_USERNAME }}"
-          TAG="${{ env.tag }}"
-            
-            if [[ -z "$USERNAME" ]]; then
-              echo "❌ ERRO: Nome de usuário do Docker Hub não está definido!"
-              exit 1
-            fi
-        
-            if [[ -z "$TAG" ]]; then
-              echo "❌ ERRO: Tag não definida!"
-              exit 1
-            fi
-        
-          IMAGE_NAME="$USERNAME/devops-cicd:$TAG"
-            
-          echo "🔹 Construindo imagem: $IMAGE_NAME"
-          docker build -t "$IMAGE_NAME" .
-        
+          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/devops-cicd:${{ env.tag }} .
 
       - name: Run Trivy vulnerability scanner
         uses: aquasecurity/trivy-action@master
         with:
-          image-ref: '${{ secrets.DOCKERHUB_USERNAME }}/ddevops-cicd:${{ env.tag }}'
+          image-ref: '${{ secrets.DOCKERHUB_USERNAME }}/devops-cicd:${{ env.tag }}'
           format: 'table'
           exit-code: '1'
           ignore-unfixed: true
