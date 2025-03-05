@@ -49,7 +49,24 @@ jobs:
         env:
           DOCKER_BUILDKIT: 1
         run: |
-          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/devops-cicd:${{ env.tag }} .
+          USERNAME="${{ secrets.DOCKERHUB_USERNAME }}"
+          TAG="${{ env.tag }}"
+            
+            if [[ -z "$USERNAME" ]]; then
+              echo "❌ ERRO: Nome de usuário do Docker Hub não está definido!"
+              exit 1
+            fi
+        
+            if [[ -z "$TAG" ]]; then
+              echo "❌ ERRO: Tag não definida!"
+              exit 1
+            fi
+        
+          IMAGE_NAME="$USERNAME/devops-cicd:$TAG"
+            
+          echo "🔹 Construindo imagem: $IMAGE_NAME"
+          docker build -t "$IMAGE_NAME" .
+        
 
       - name: Run Trivy vulnerability scanner
         uses: aquasecurity/trivy-action@master
